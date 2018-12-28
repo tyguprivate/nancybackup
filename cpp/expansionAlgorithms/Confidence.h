@@ -1,8 +1,8 @@
 #pragma once
 #include <unordered_map>
 #include <functional>
-#include <limits>
 #include <memory>
+#include <limits>
 #include "ExpansionAlgorithm.h"
 #include "../utility/PriorityQueue.h"
 #include"../utility/ResultContainer.h"
@@ -10,14 +10,14 @@
 using namespace std;
 
 template <class Domain, class Node, class TopLevelAction>
-class Risk : public ExpansionAlgorithm<Domain, Node, TopLevelAction>
+class Confidence : public ExpansionAlgorithm<Domain, Node, TopLevelAction>
 {
 	typedef typename Domain::State State;
 	typedef typename Domain::Cost Cost;
 	typedef typename Domain::HashState Hash;
 
 public:
-	Risk(Domain& domain, double lookahead, int expansionAllocation)
+	Confidence(Domain& domain, double lookahead, int expansionAllocation)
 		: domain(domain), lookahead(lookahead), expansionsPerIteration(expansionAllocation)
 	{}
 
@@ -124,8 +124,8 @@ public:
 private:
 	int simulateExpansion(vector<TopLevelAction>& tlas)
 	{
-		int minimalRiskTLA = 0;
-		double minimalRisk = numeric_limits<double>::infinity();
+		int maximalConfidenceTLA = 0;
+		double maximalConfidence = -1;
 
 		// Start by identifying alpha: the TLA with lowest expected cost
 		int alphaTLA = 0;
@@ -142,7 +142,7 @@ private:
 		// Iterate over the top level actions
 		for (int i = 0; i < tlas.size(); i++)
 		{
-			// If this TLA has no unique subtree, skip its risk calc, it is pruned
+			// If this TLA has no unique subtree, skip its confidence calc, it is pruned
 			if (tlas[i].open.empty())
 				continue;
 
@@ -156,48 +156,41 @@ private:
 			vector<TopLevelAction> squishedTopLevelActions = tlas;
 			squishedTopLevelActions[i].belief.squish(squishFactor);
 
-			// Calculate the risk associated with expanding that node (by using the simulated belief as alpha in risk analysis)
-			double riskCalculation = riskAnalysis(alphaTLA, squishedTopLevelActions);
+			// Calculate the confidence associated with expanding that node (by using the simulated belief as alpha in confidence analysis)
+			double confidenceCalculation = confidenceAnalysis(alphaTLA, squishedTopLevelActions);
 
-			// If this is the first TLA risk has been calculated for, it by default minimizes risk...
-            // If two actions minimize risk by same value, tie break on f-hat -> f -> g in this order.
-            if (riskCalculation == minimalRisk)
-            {
-                if (tlas[i].topLevelNode->getFHatValue() == tlas[minimalRiskTLA].topLevelNode->getFHatValue())
-                {
-                    if (tlas[i].topLevelNode->getFValue() == tlas[minimalRiskTLA].topLevelNode->getFValue())
-                    {
-                        if (tlas[i].topLevelNode->getGValue() > tlas[minimalRiskTLA].topLevelNode->getGValue())
-                        {
-                            minimalRiskTLA = i;
-                        }
-                    }
-                    else if (tlas[i].topLevelNode->getFValue() < tlas[minimalRiskTLA].topLevelNode->getFValue())
-                    {
-                        minimalRiskTLA = i;
-                    }
-                }
-                else if (tlas[i].topLevelNode->getFHatValue() < tlas[minimalRiskTLA].topLevelNode->getFHatValue())
-                {
-                    minimalRiskTLA = i;
-                }
-            }
-			else if (riskCalculation < minimalRisk)
+			// If this is the first TLA confidence has been calculated for, it by default maximizes confidence...
+			if (confidenceCalculation > maximalConfidence)
 			{
 				// Otherwise the TLA with the lower risk replaces the current lowest
-				minimalRisk = riskCalculation;
-				minimalRiskTLA = i;
+				maximalConfidence = confidenceCalculation;
+				maximalConfidenceTLA = i;
 			}
+            else if (confidenceCalculation == maximalConfidence)
+            {
+                // Tie break on f -> g
+                if (tlas[i].topLevelNode->getFValue() == tlas[maximalConfidenceTLA].topLevelNode->getFValue())
+                {
+                    if (tlas[i].topLevelNode->getGValue() > tlas[maximalConfidenceTLA].topLevelNode->getGValue())
+                    {
+                        maximalConfidenceTLA = i;
+                    }
+                }
+                else if (tlas[i].topLevelNode->getFValue() < tlas[maximalConfidenceTLA].topLevelNode->getFValue())
+                {
+                    maximalConfidenceTLA = i;
+                }
+            }
 		}
 
-		return minimalRiskTLA;
+		return maximalConfidenceTLA;
 	}
 
-	double riskAnalysis(int alphaIndex, vector<TopLevelAction>& squishedTopLevelActions)
+	double confidenceAnalysis(int alphaIndex, vector<TopLevelAction>& squishedTopLevelActions)
 	{
-		double risk = 0;
+		double probability = 0;
 
-		// Perform numerical integration to calculate risk associated with taking alpha as the expansion
+		// Perform numerical integration to calculate confidence associated with taking alpha as the expansion
 		for (auto alpha : squishedTopLevelActions[alphaIndex].belief)
 		{
 			for (int tla = 0; tla < squishedTopLevelActions.size(); tla++)
@@ -213,8 +206,8 @@ private:
 					if (beta.cost < alpha.cost)
 					{
 						// Calculate the risk
-						double value = alpha.probability * beta.probability * (alpha.cost - beta.cost);
-						risk += value;
+						double value = alpha.probability * beta.probability;
+						probability += value;
 					}
 					else
 						break;
@@ -222,7 +215,7 @@ private:
 			}
 		}
 
-		return risk;
+		return 1 - probability;
 	}
 
 	void csernaBackup(TopLevelAction& tla)

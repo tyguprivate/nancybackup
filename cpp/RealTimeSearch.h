@@ -3,6 +3,7 @@
 #include <set>
 #include <functional>
 #include <unordered_map>
+#include <memory>
 #include "utility/DiscreteDistribution.h"
 #include "utility/PriorityQueue.h"
 #include "utility/ResultContainer.h"
@@ -14,6 +15,7 @@
 #include "expansionAlgorithms/BreadthFirst.h"
 #include "expansionAlgorithms/DepthFirst.h"
 #include "expansionAlgorithms/Risk.h"
+#include "expansionAlgorithms/Confidence.h"
 #include "learningAlgorithms/LearningAlgorithm.h"
 #include "learningAlgorithms/Dijkstra.h"
 #include "learningAlgorithms/Ignorance.h"
@@ -130,10 +132,15 @@ public:
 
         static bool compareNodesFHat(const Node* n1, const Node* n2) {
             // Tie break on g-value
-            if (n1->getFHatValue() == n2->getFHatValue()) {
-                return n1->getGValue() > n2->getGValue();
-            }
-            return n1->getFHatValue() < n2->getFHatValue();
+			if (n1->getFHatValue() == n2->getFHatValue())
+			{
+                if (n1->getFValue() == n2->getFValue())
+                {
+				    return n1->getGValue() > n2->getGValue();
+                }
+                return n1->getFValue() < n2->getFValue();
+			}
+			return n1->getFHatValue() < n2->getFHatValue();
         }
 
         static bool compareNodesH(const Node* n1, const Node* n2) {

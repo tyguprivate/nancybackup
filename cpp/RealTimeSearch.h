@@ -444,7 +444,7 @@ private:
 			TopLevelAction tla;
 			tla.topLevelNode = childNode;
 
-			childNode->distribution = DiscreteDistribution(5, childNode->getFValue(), childNode->getFHatValue(), 
+			childNode->distribution = DiscreteDistribution(100, childNode->getFValue(), childNode->getFHatValue(), 
 				childNode->getDValue(), childNode->getFHatValue() - childNode->getFValue());
 
 			tla.expectedMinimumPathCost = childNode->distribution.expectedCost();

@@ -4,6 +4,7 @@
 #include <functional>
 #include <unordered_map>
 #include <memory>
+#include <cmath>
 #include "utility/DiscreteDistribution.h"
 #include "utility/PriorityQueue.h"
 #include "utility/ResultContainer.h"

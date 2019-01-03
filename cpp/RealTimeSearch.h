@@ -222,6 +222,51 @@ public:
 		clean();
 	}
 
+	static int randNum(int max){
+		
+		int x = rand() % max;
+
+
+		return x;
+	}
+		
+	void MCTS(State start, ResultContainer& res){
+		cout << "Starting MCTS" << endl;
+
+		srand(time(0));
+		State cur = start;
+		int r;
+
+		vector<int> path;
+		path.push_back(start.getLabel());
+
+		while (!domain.isGoal(cur))
+		{
+	
+			vector<State> children = domain.successors(cur);
+
+			if (children.size() == 0 && !domain.isGoal(cur)){
+				for (int i : path){
+					cout << i << " ";
+				}
+				cur = start;
+				cout << "Back to the start!" << endl;
+				path.clear();
+			} else {
+				r = randNum(children.size());
+				cur = children[r];
+				path.push_back(cur.getLabel());
+			}
+		}
+
+		for (int i : path){
+			cout << i << " ";
+		}
+		cout << "GOAL!" << endl;
+		
+	}
+
+
 	ResultContainer search()
 	{
 		domain.initialize(expansionPolicy, lookahead);
@@ -233,40 +278,43 @@ public:
 			domain.distanceErr(domain.getStartState()), domain.epsilonHGlobal(), domain.epsilonDGlobal(), 
 			domain.getStartState(), NULL, -1);
 
-		while (1)
-		{
-			// Check if a goal has been reached
-			if (domain.isGoal(start->getState()))
+		if (expansionPolicy == "mcts"){
+			MCTS(domain.getStartState(), res);
+		} else
+			while (1)
 			{
-				// Calculate path cost and return solution
-				calculateCost(start, res);
+				// Check if a goal has been reached
+				if (domain.isGoal(start->getState()))
+				{
+					// Calculate path cost and return solution
+					calculateCost(start, res);
 
-				return res;
+					return res;
+				}
+				
+				restartLists(start);
+
+				// Exploration Phase
+				domain.updateEpsilons();
+
+				// First, generate the top-level actions
+				generateTopLevelActions(start, res);
+
+				// Expand some nodes until expnasion limit
+				expansionAlgo->expand(open, closed, tlas, duplicateDetection, res);
+
+				// Check if this is a dead end
+				if (open.empty())
+				{
+					break;
+				}
+
+				//  Learning Phase
+				learningAlgo->learn(open, closed);
+
+				// Decision-making Phase
+				start = decisionAlgo->backup(open, tlas, start);
 			}
-			
-			restartLists(start);
-
-			// Exploration Phase
-			domain.updateEpsilons();
-
-			// First, generate the top-level actions
-			generateTopLevelActions(start, res);
-
-			// Expand some nodes until expnasion limit
-			expansionAlgo->expand(open, closed, tlas, duplicateDetection, res);
-
-			// Check if this is a dead end
-			if (open.empty())
-			{
-				break;
-			}
-
-			//  Learning Phase
-			learningAlgo->learn(open, closed);
-
-			// Decision-making Phase
-			start = decisionAlgo->backup(open, tlas, start);
-		}
 
 		return res;
 	}

@@ -12,11 +12,17 @@
 
 using namespace std;
 
+
+
+
 int main(int argc, char** argv)
 {
+	cout << "starting" << endl;
+
+	
 	if (argc > 4 || argc < 3)
 	{
-		cout << "Wrong number of arguments: ./backupTestsAS <Domain Type> <lookahead depth> <optional: output file> < <domain file>" << endl;
+		cout << "Wrong number of arguments: ./mctsTests <Domain Type> <lookahead depth> <optional: output file> < <domain file>" << endl;
 		cout << "Available domains are TreeWorld and SlidingPuzzle" << endl;
 		exit(1);
 	}
@@ -27,16 +33,20 @@ int main(int argc, char** argv)
 	// Get the domain type
 	string domain = argv[1];
 
-	ResultContainer miniminRes;
+	ResultContainer mctsRes;
 
 	if (domain == "TreeWorld") {
+		cout << "testing on TreeWorld" << endl;
+
 		// Make a tree world
 		TreeWorld world = TreeWorld(cin);
 
 		// Run DFS with differing backup methods for decision making
-		RealTimeSearch<TreeWorld> minimin(world, "a-star", "none", "minimin", lookaheadDepth);
+		
+		RealTimeSearch<TreeWorld> mcts(world, "mcts", "none", "mcts", lookaheadDepth);
+		mctsRes = mcts.search();
 
-		miniminRes = minimin.search();
+
 
 	} else if (domain == "SlidingPuzzle") {
         cout << "Needs to be implemented" << endl;

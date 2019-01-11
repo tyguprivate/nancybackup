@@ -232,39 +232,50 @@ public:
 		
 	void MCTS(State start, ResultContainer& res){
 		cout << "Starting MCTS" << endl;
+		int r;
+		vector<int> path;
+		double sum;
+		int cnt = 0;
+		int limit = 1000;
 
 		srand(time(0));
-		State cur = start;
-		int r;
 
-		vector<int> path;
-		path.push_back(start.getLabel());
-
-		while (!domain.isGoal(cur))
-		{
-	
-			vector<State> children = domain.successors(cur);
-
-			if (children.size() == 0 && !domain.isGoal(cur)){
-				for (int i : path){
-					cout << i << " ";
-				}
-				cur = start;
-				cout << "Back to the start!" << endl;
-				path.clear();
-			} else {
-				r = randNum(children.size());
-				cur = children[r];
-				path.push_back(cur.getLabel());
-			}
-		}
-
-		for (int i : path){
-			cout << i << " ";
-		}
-		cout << "GOAL!" << endl;
+		while (cnt < limit){
+			State cur = start;
+			double cost = 0;
+			while (!domain.isGoal(cur))
+			{
 		
+				vector<State> children = domain.successors(cur);
+
+				if (children.size() == 0 && !domain.isGoal(cur)){
+					// This does not happen... Will delete or somehow use it for a different domain...
+					for (int i : path){
+						cout << i << " ";
+					}
+					cur = start;
+					path.clear();
+				} else {
+					r = randNum(children.size());
+					cur = children[r];
+					path.push_back(cur.getLabel());
+					cost += domain.getEdgeCost(cur);
+				}
+			}
+			sum += cost;
+			/*
+			for (int i : path){
+				cout << i << " ";
+			}
+			*/
+			path.clear();
+			cnt++;
+			// cout << "Cost: " << cost << endl;
+		}
+		
+		cout << "Avg cost: " << (sum / limit) << endl;
 	}
+
 
 
 	ResultContainer search()

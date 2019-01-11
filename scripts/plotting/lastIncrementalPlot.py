@@ -56,8 +56,8 @@ differenceCost = []
 print("reading in data...")
 
 for dir in resultDirs:
-    for file in listdir("../../results/TreeWorld/lastIncrementalDecision/" + dir):
-        with open("../../results/TreeWorld/lastIncrementalDecision/" + dir + "/" + file) as json_data:
+    for file in listdir("../../../results/TreeWorld/lastIncrementalDecision/" + dir):
+        with open("../../../results/TreeWorld/lastIncrementalDecision/" + dir + "/" + file) as json_data:
             resultData = json.load(json_data)
             for algo in algorithms:
                 instance.append(str(dir))
@@ -92,8 +92,8 @@ for instance in resultDirs:
     elif instanceData["Depth Limit"].iloc[0] == 9:
         depths.append(9)
     
-    makeViolinPlot(11, 8, "Depth Limit", "Solution Cost", instanceData, 0.741, "Algorithm", depths, algorithms, "Depth Limit", "Solution Cost", "../../plots/Experiment1AViolin" + instance + ".pdf")
+    makeViolinPlot(11, 8, "Depth Limit", "Solution Cost", instanceData, 0.741, "Algorithm", depths, algorithms, "Depth Limit", "Solution Cost", "../../../plots/Experiment1AViolin" + instance + ".pdf")
 	    
     instanceDataDiff = dfDiff.loc[dfDiff["instance"] == instance]
 
-    makeDifferencePlot(11, 8, "Depth Limit", "Algorithm Cost - Cserna Cost", instanceDataDiff, 0.3, "Algorithm", depths, algorithms, "Depth Limit", "Algorithm Cost - Cserna Cost", "../../plots/Experiment1ADifference" + instance + ".pdf", colors)
+    makeDifferencePlot(11, 8, "Depth Limit", "Algorithm Cost - Cserna Cost", instanceDataDiff, 0.3, "Algorithm", depths, algorithms, "Depth Limit", "Algorithm Cost - Cserna Cost", "../../../plots/Experiment1ADifference" + instance + ".pdf", colors)

@@ -17,7 +17,6 @@ using namespace std;
 
 int main(int argc, char** argv)
 {
-	cout << "starting" << endl;
 
 	
 	if (argc > 4 || argc < 3)
@@ -36,7 +35,6 @@ int main(int argc, char** argv)
 	ResultContainer mctsRes;
 
 	if (domain == "TreeWorld") {
-		cout << "testing on TreeWorld" << endl;
 
 		// Make a tree world
 		TreeWorld world = TreeWorld(cin);
@@ -50,6 +48,14 @@ int main(int argc, char** argv)
 
 	} else if (domain == "SlidingPuzzle") {
         cout << "Needs to be implemented" << endl;
+
+		// Make a tile puzzle
+		SlidingTilePuzzle world = SlidingTilePuzzle(cin);
+
+		RealTimeSearch<SlidingTilePuzzle> mcts(world, "mcts", "none", "mcts", lookaheadDepth);
+		mctsRes = mcts.search();
+
+
 		exit(1);
 	} else {
 		cout << "Available domains are TreeWorld and SlidingPuzzle" << endl;
@@ -70,13 +76,12 @@ int main(int argc, char** argv)
 
 	if (argc < 4)
 	{
-		cout << "result" << endl;
+		// cout << "mcts result" << endl;
 	}
 	else
 	{
 		ofstream out(argv[3]);
-
-		out << "result";
+		out << "mcts result";
 		out.close();
 	}
 

@@ -42,13 +42,14 @@ resultDirs = {"b2d10"}
 
 markers=["o", "v", "s", "<", "p", "h", "^", "D", "X", ">", "o", "v", "s", "<", "p", "h", "^", "D", "X", ">"]
 
+
 colors=["#e6194b", "#3cb44b", "#ffe119", "#0082c8", "#f58231", "#911eb4",
-        "#46f0f0", "#f032e6", "#229954", "#fabebe", "#008080", "#e6beff", 
-        "#aa6e28", "#800000", "#808000", "#D35400"]
+        "#46f0f0", "#f032e6", "#808000", "#fabebe", "#008080", "#e6beff", 
+        "#aa6e28", "#800000", "#000000"]
 
 algorithms = ["Minimin", "Bellman", "Nancy", "K-Best 1 Correct Belief", "K-Best 3 Correct Belief", "K-Best 5 Correct Belief", 
               "K-Best 7 Correct Belief", "Cserna Correct Belief", "K-Best 1", "K-Best 3", "K-Best 5", 
-              "K-Best 7", "Cserna"]
+              "K-Best 7", "Cserna", "Random"]
 
 instance = []
 lookAheadVals = []

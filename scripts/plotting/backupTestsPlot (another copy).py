@@ -44,9 +44,7 @@ colors=["#e6194b", "#3cb44b", "#ffe119", "#0082c8", "#f58231", "#911eb4",
         "#46f0f0", "#f032e6", "#229954", "#fabebe", "#008080", "#e6beff", 
         "#aa6e28", "#800000", "#808000", "#D35400"]
 
-algorithms = ["Minimin", "Bellman", "Nancy", "K-Best 3", "K-Best 10", "K-Best 30", "Cserna", "K-Best 3 One Level Belief", "K-Best 10 One Level Belief", "K-Best 30 One Level Belief", "Cserna One Level Belief", "Random"]
-
-algorithmsAAAI19Slides = ["Minimin", "Bellman", "Nancy", "Cserna", "Random"]
+algorithms = ["Minimin", "Bellman", "Nancy", "K-Best 3", "K-Best 10", "K-Best 30", "Cserna", "Cserna One Level Belief", "Random"]
 
 depthsDFS = [3, 7, 10]
 
@@ -141,4 +139,3 @@ for instance in resultDirs:
     makeViolinPlot(13, 10, "Node Expansion Limit", "Solution Cost", instanceDataAS, 0.725, "Algorithm", depthsAS, algorithms, "Node Expansion Limit", "Solution Cost", "../../../plots/Experiment1CViolin" + instance + ".pdf", colors)
     makeDifferencePlot(13, 10, "Node Expansion Limit", "Algorithm Cost - Cserna Cost", instanceDataDiffAS, 0.5, "Algorithm", depthsAS, algorithms, "Node Expansion Limit", "Algorithm Cost - Cserna One Level Belief Cost", "../../../plots/Experiment1CDifference" + instance + ".pdf", colors, markers)
 
-    makeDifferencePlot(13, 10, "Node Expansion Limit", "Algorithm Cost - Cserna Cost", instanceDataDiffASAAAISlide, 0.5, "Algorithm", depthsAS, algorithmsAAAI19Slides, "Node Expansion Limit", "Algorithm Cost - Cserna Cost", "../../../plots/Experiment1CDifference" + instance + "AAAI19Slides.pdf", colors, markers)

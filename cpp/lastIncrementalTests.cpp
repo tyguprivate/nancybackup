@@ -10,6 +10,28 @@
 
 using namespace std;
 
+static int randNum(int max){
+	int x = rand() % max;
+	return x;
+}
+
+double MCTS(TreeWorld domain, int lookaheadDepth){
+		domain.initialize("mcts", lookaheadDepth);
+		TreeWorld::State cur = domain.getStartState();
+		int r;
+		double cost = 0;
+		srand(time(0));
+
+		while (!domain.isGoal(cur)){
+			vector<TreeWorld::State> children = domain.successors(cur);
+
+			r = randNum(children.size());
+			cur = children[r];
+			cost += domain.getEdgeCost(cur);
+		}
+		return cost;
+}
+
 int main(int argc, char** argv)
 {
 	if (argc > 3 || argc < 2)
@@ -65,6 +87,7 @@ int main(int argc, char** argv)
 		", \"Bellman\": " + to_string(bellmanRes.solutionCost) +
 		", \"Minimin\": " + to_string(miniminRes.solutionCost) +
 		", \"Nancy\": " + to_string(nancyRes.solutionCost) +
+		", \"Random\": " + to_string(MCTS(world, lookaheadDepth)) +
 		", \"Lookahead\": " + to_string(lookaheadDepth) + " }";
 
 	if (argc < 3)

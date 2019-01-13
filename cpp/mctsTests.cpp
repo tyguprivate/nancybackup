@@ -12,8 +12,27 @@
 
 using namespace std;
 
+static int randNum(int max){
+	int x = rand() % max;
+	return x;
+}
 
+double MCTS(TreeWorld domain, int lookaheadDepth){
+		domain.initialize("mcts", lookaheadDepth);
+		TreeWorld::State cur = domain.getStartState();
+		int r;
+		double cost = 0;
+		srand(time(0));
 
+		while (!domain.isGoal(cur)){
+			vector<TreeWorld::State> children = domain.successors(cur);
+
+			r = randNum(children.size());
+			cur = children[r];
+			cost += domain.getEdgeCost(cur);
+		}
+		return cost;
+}
 
 int main(int argc, char** argv)
 {
@@ -33,56 +52,30 @@ int main(int argc, char** argv)
 	string domain = argv[1];
 
 	ResultContainer mctsRes;
-
+	string result;
 	if (domain == "TreeWorld") {
 
 		// Make a tree world
-		TreeWorld world = TreeWorld(cin);
-
-		// Run DFS with differing backup methods for decision making
-		
-		RealTimeSearch<TreeWorld> mcts(world, "mcts", "none", "mcts", lookaheadDepth);
-		mctsRes = mcts.search();
-
-
+		TreeWorld world = TreeWorld(cin);	
+		result = "{ \"Random\": " + to_string(MCTS(world, lookaheadDepth)) + " }";	
 
 	} else if (domain == "SlidingPuzzle") {
         cout << "Needs to be implemented" << endl;
-
-		// Make a tile puzzle
-		SlidingTilePuzzle world = SlidingTilePuzzle(cin);
-
-		RealTimeSearch<SlidingTilePuzzle> mcts(world, "mcts", "none", "mcts", lookaheadDepth);
-		mctsRes = mcts.search();
-
-
 		exit(1);
 	} else {
 		cout << "Available domains are TreeWorld and SlidingPuzzle" << endl;
 		exit(1);
 	}
-
-    /*
-	string result = "{ \"Minimin\": " + to_string(miniminRes.solutionCost) + ", \"Bellman\": " +
-		to_string(bellmanRes.solutionCost) + ", \"Nancy\": " + to_string(nancyRes.solutionCost) +
-		", \"Cserna\": " + to_string(csernaRes.solutionCost) + ", \"Cserna Pemberton Belief\": " +
-		to_string(pembertonRes.solutionCost) + ", \"K-Best 3\": " + to_string(k3Res.solutionCost) +
-		", \"K-Best 10\": " + to_string(k10Res.solutionCost) + ", \"K-Best 30\": " + to_string(k30Res.solutionCost) +
-		", \"K-Best 3 Pemberton Belief\": " + to_string(pk3Res.solutionCost) +
-		", \"K-Best 10 Pemberton Belief\": " + to_string(pk10Res.solutionCost) +
-		", \"K-Best 30 Pemberton Belief\": " + to_string(pk30Res.solutionCost) +
-		", \"Lookahead\": " + to_string(lookaheadDepth) + " }";
-    */
-
+    
 	if (argc < 4)
 	{
-		// cout << "mcts result" << endl;
+		cout << result << endl;
 	}
 	else
 	{
 		ofstream out(argv[3]);
-		out << "mcts result";
+
+		out << result;
 		out.close();
 	}
-
 }

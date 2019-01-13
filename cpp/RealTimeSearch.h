@@ -222,62 +222,6 @@ public:
 		clean();
 	}
 
-	static int randNum(int max){
-		
-		int x = rand() % max;
-
-
-		return x;
-	}
-		
-	void MCTS(State start, ResultContainer& res){
-		cout << "Starting MCTS" << endl;
-		int r;
-		vector<int> path;
-		double sum;
-		int cnt = 0;
-		int limit = 1000;
-
-		srand(time(0));
-
-		while (cnt < limit){
-			State cur = start;
-			double cost = 0;
-			while (!domain.isGoal(cur))
-			{
-		
-				vector<State> children = domain.successors(cur);
-
-				if (children.size() == 0 && !domain.isGoal(cur)){
-					// This does not happen... Will delete or somehow use it for a different domain...
-					for (int i : path){
-						cout << i << " ";
-					}
-					cur = start;
-					path.clear();
-				} else {
-					r = randNum(children.size());
-					cur = children[r];
-					path.push_back(cur.getLabel());
-					cost += domain.getEdgeCost(cur);
-				}
-			}
-			sum += cost;
-			/*
-			for (int i : path){
-				cout << i << " ";
-			}
-			*/
-			path.clear();
-			cnt++;
-			// cout << "Cost: " << cost << endl;
-		}
-		
-		cout << "Avg cost: " << (sum / limit) << endl;
-	}
-
-
-
 	ResultContainer search()
 	{
 		domain.initialize(expansionPolicy, lookahead);
@@ -286,47 +230,44 @@ public:
 
 		// Get the start node
 		Node* start = new Node(0, domain.heuristic(domain.getStartState()), domain.distance(domain.getStartState()),
-			domain.distanceErr(domain.getStartState()), domain.epsilonHGlobal(), domain.epsilonDGlobal(), 
+			domain.distanceErr(domain.getStartState()), domain.epsilonHGlobal(), domain.epsilonDGlobal(),
 			domain.getStartState(), NULL, -1);
 
-		if (expansionPolicy == "mcts"){
-			MCTS(domain.getStartState(), res);
-		} else
-			while (1)
+		while (1)
+		{
+			// Check if a goal has been reached
+			if (domain.isGoal(start->getState()))
 			{
-				// Check if a goal has been reached
-				if (domain.isGoal(start->getState()))
-				{
-					// Calculate path cost and return solution
-					calculateCost(start, res);
+				// Calculate path cost and return solution
+				calculateCost(start, res);
 
-					return res;
-				}
-				
-				restartLists(start);
+				return res;
+			}
+			
+			restartLists(start);
 
-				// Exploration Phase
-				domain.updateEpsilons();
+			// Exploration Phase
+			domain.updateEpsilons();
 
-				// First, generate the top-level actions
-				generateTopLevelActions(start, res);
+			// First, generate the top-level actions
+			generateTopLevelActions(start, res);
 
-				// Expand some nodes until expnasion limit
-				expansionAlgo->expand(open, closed, tlas, duplicateDetection, res);
+			// Expand some nodes until expnasion limit
+			expansionAlgo->expand(open, closed, tlas, duplicateDetection, res);
 
-				// Check if this is a dead end
-				if (open.empty())
-				{
-					break;
-				}
-
-				//  Learning Phase
-				learningAlgo->learn(open, closed);
-
-				// Decision-making Phase
-				start = decisionAlgo->backup(open, tlas, start);
+			// Check if this is a dead end
+			if (open.empty())
+			{
+				break;
 			}
 
+			//  Learning Phase
+			learningAlgo->learn(open, closed);
+
+			// Decision-making Phase
+			start = decisionAlgo->backup(open, tlas, start);
+		}
+		
 		return res;
 	}
 
@@ -338,7 +279,8 @@ public:
 
 		// Get the start node
 		Node* start = new Node(0, domain.heuristic(domain.getStartState()), domain.distance(domain.getStartState()),
-			domain.distanceErr(domain.getStartState()), domain.epsilonHGlobal(), domain.epsilonDGlobal(), domain.getStartState(), NULL, -1);
+			domain.distanceErr(domain.getStartState()), domain.epsilonHGlobal(), domain.epsilonDGlobal(),
+			domain.getStartState(), NULL, -1);
 
 		// Check if a goal has been reached
 		if (domain.isGoal(start->getState()))

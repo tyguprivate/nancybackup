@@ -9,9 +9,11 @@
 #include "learningAlgorithms/Dijkstra.h"
 #include "domain/TreeWorld.h"
 #include "domain/SlidingTilePuzzle.h"
+#include "randomSearch.h"
 
 using namespace std;
 
+/*
 static int randNum(int max){
 	int x = rand() % max;
 	return x;
@@ -33,6 +35,7 @@ double MCTS(TreeWorld domain, int lookaheadDepth){
 		}
 		return cost;
 }
+*/
 
 int main(int argc, char** argv)
 {
@@ -93,7 +96,9 @@ int main(int argc, char** argv)
 		pk10Res = pk10.search();
 		pk30Res = pk30.search();
 
-		randomCost = MCTS(world, lookaheadDepth);
+		RandomSearch<TreeWorld> r(world, lookaheadDepth);
+		randomCost = r.randomSearch();
+
 	}
 	else if (domain == "SlidingPuzzle")
 	{

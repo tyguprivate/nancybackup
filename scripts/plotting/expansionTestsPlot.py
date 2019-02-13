@@ -36,7 +36,7 @@ def makeDifferencePlot(width, height, xAxis, yAxis, dataframe, dodge, hue, order
     return
 
 # Hard coded result directories
-resultDirs = {"4x4-b100"}
+resultDirs = {"4x4"}
 limits = [10, 30, 100, 300, 1000]
 algorithms = ["A*", "F-Hat", "BFS", "Risk", "LSS-LRTA*"]
 
